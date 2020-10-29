@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<style>
+		.btn
+		{
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			background-color: orangered;
+			position: absolute;
+			margin: auto;
+			bottom: 100px;
+			left: 0;
+			right: 0;
+		}
+
+		.play
+		{
+			border: 10px solid transparent;
+			border-left-width: 10px;
+			border-left-color: #FFFFFF;
+			position: absolute;
+			margin: auto;
+			top: 0;
+			left: 10px;
+			right: 0;
+			bottom: 0;
+			width: 0px;
+			height: 0px;
+			opacity: 0;
+			transition: all .2s;
+			transform: scale(.2);
+			transform-origin: 5px 50%;
+		}
+
+		.pause
+		{
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			margin: auto;
+			width: 15px;
+			height: 20px;
+			opacity: 0;
+			transition: all .2s;
+			transform: scale(.2);
+			transform-origin: 5px 50%;
+		}
+
+		.left
+		{
+			float: left;
+			height: 100%;
+			width: 4px;
+			background-color: #FFFFFF;
+		}
+
+		.right
+		{
+			float: right;
+			height: 100%;
+			width: 4px;
+			background-color: #FFFFFF;
+		}
+
+		.on
+		{
+			opacity: 1;
+			transform: scale(1);
+		}
+
+		.main
+		{
+			margin: auto;
+			width: 400px;
+			height: 300px;
+			position: relative;
+			background-color: #555555;
+		}
+
+		.line
+		{
+			position: absolute;
+			width: 300px;
+			height: 8px;
+			border-radius: 2px;
+			background-color: #FFFFFF;
+			margin: auto;
+			left: 0;
+			right: 0;
+			top: 50px;
+		}
+
+		.line .red
+		{
+			width: 0;
+			height: 100%;
+			background-color: orangered;
+			border-radius: 0;
+			position: absolute;
+		}
+		.line .red .circle
+		{
+			width: 15px;
+			height: 15px;
+			background-color: orangered;
+			border-radius: 50%;
+			position: absolute;
+			top: -3px;
+			left : -2px;
+		}
+		#output{
+			text-align: center;
+			width: 200px;
+			color: #FFFFFF;
+			background-color: darkorange;
+			position: absolute;
+			top: 80px;
+			left: 0;
+			right: 0;
+			margin: auto;
+		}
+		.volume
+		{
+			width: 200px;
+			height: 8px;
+			background-color: yellow;
+			border-radius: 2px;
+			position: absolute;
+			margin: auto;
+			left: 0;
+			right: 0;
+			bottom: 30px;
+		}
+		.volume .orange
+		{
+			width: 0;
+			height: 100%;
+			background-color: orange;
+			border-radius: 2px;
+			position: absolute;
+		}
+		.volume .orange .circle1
+		{
+			width: 15px;
+			height: 15px;
+			background-color: orange;
+			border-radius: 50%;
+			position: absolute;
+			left: 0;
+			top: -4px;
+		}
+	</style>
+
+</head>
+<body>
+<div class="out"></div>
+<audio src="h.mp3" id="mp3"></audio>
+<div class="main">
+	<div class="line">
+		<div class="red">
+			<div class="circle"></div>
+		</div>
+	</div>
+	<div id="output">
+
+	</div>
+	<div class="btn">
+		<div class="play"></div>
+		<div class="pause">
+			<div class="left"></div>
+			<div class="right"></div>
+		</div>
+	</div>
+	<div class="volume">
+		<div class="orange">
+			<div class="circle1"></div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var control;
+	let play = document.querySelector('.play');
+	play.classList.toggle('on');
+	let btn = document.querySelector('.btn');
+	btn.addEventListener('click', function()
+	{
+		let play  = document.querySelector('.play');
+		let pause = document.querySelector('.pause');
+		play.classList.toggle('on');
+		pause.classList.toggle('on');
+		if(pause.classList.contains('on'))
+		{
+		    let audio = document.querySelector('#mp3');
+		    audio.play();
+		    control = setInterval(function()
+			{
+				let du = audio.duration;
+				let ct = audio.currentTime;
+				let out = document.querySelector('#output');
+				out.innerHTML = (ct / 100).toFixed(2) + "  /  "
+					+ (du / 100).toFixed(2);
+				let w = (ct * 300) / du;
+				let red = document.querySelector('.red');
+				let line = document.querySelector('.line');
+				line.onclick = function(e)
+				{
+					console.log(e.offsetX);
+					audio.currentTime = (e.offsetX * du) / 300;
+				};
+
+				red.style.width = w + "px";
+				let cir = document.querySelector('.circle');
+				w -= 2;
+				cir.style.left = w + "px";
+
+
+			},100);
+		}
+		else
+		{
+			document.querySelector('#mp3').pause();
+			clearInterval(control);
+
+		}
+	});
+
+	function getVol()
+	{
+		let audio = document.querySelector('#mp3');
+		let orange = document.querySelector('.orange');
+		orange.style.width = (audio.volume * 200) + "px";
+		let cir = document.querySelector('.volume .orange .circle1');
+		cir.style.left = ((audio.volume * 200)-2) + "px";
+
+	}
+
+	function setVol()
+	{
+		let vol = document.querySelector('.volume');
+		vol.onclick = function(e)
+		{
+			let orange = document.querySelector('.orange');
+			orange.style.width = e.offsetX + "px";
+			let cir = document.querySelector('.volume .orange .circle1');
+			cir.style.left = (e.offsetX - 2) + "px";
+			let audio = document.querySelector('#mp3');
+			audio.volume = (e.offsetX / 200);
+		}
+
+	}
+
+	getVol();
+	setVol();
+
+</script>
+
+</body>
+</html>
